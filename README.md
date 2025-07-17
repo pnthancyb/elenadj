@@ -29,7 +29,7 @@ Whether you're seeking the perfect soundtrack for a rainy day, an epic workout, 
 
 ---
 
-## 🌱 Coming Soon: v3 (Because My Wife Asked 💍)
+## 🌱 Coming Soon: v3 
 
 Elena will soon:
 - Generate album covers via Gemini Flash
