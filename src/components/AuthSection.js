@@ -143,3 +143,96 @@ const AuthSection = ({ isAuthenticated, setIsAuthenticated }) => {
 };
 
 export default AuthSection;
+import React, { useState } from 'react';
+import { ExternalLink, CheckCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { getAuthUrl, authenticate } from '../services/api';
+
+const AuthSection = ({ isAuthenticated, onAuthSuccess }) => {
+  const [callbackUrl, setCallbackUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleGetAuthUrl = async () => {
+    try {
+      const data = await getAuthUrl();
+      window.open(data.auth_url, '_blank');
+      toast.success('Spotify authentication opened in new tab');
+    } catch (error) {
+      toast.error('Failed to get authentication URL');
+    }
+  };
+
+  const handleAuthenticate = async () => {
+    if (!callbackUrl.trim()) {
+      toast.error('Please paste the callback URL');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await authenticate(callbackUrl);
+      if (result.success) {
+        toast.success(result.message);
+        onAuthSuccess();
+        setCallbackUrl('');
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      toast.error('Authentication failed');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isAuthenticated) {
+    return (
+      <div className="card card-auth mb-8">
+        <div className="flex items-center text-green-400">
+          <CheckCircle className="w-6 h-6 mr-3" />
+          <span className="text-lg font-semibold">✅ Spotify Connected</span>
+        </div>
+        <p className="text-gray-300 mt-2">You can now generate personalized playlists!</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card card-auth mb-8">
+      <h3 className="text-2xl font-bold mb-4">🔐 Spotify Authentication</h3>
+      <p className="text-gray-300 mb-6">Connect your Spotify account to start creating personalized playlists</p>
+      
+      <div className="space-y-4">
+        <button
+          onClick={handleGetAuthUrl}
+          className="btn-primary w-full flex items-center justify-center"
+        >
+          <ExternalLink className="w-5 h-5 mr-2" />
+          🎵 Connect Spotify
+        </button>
+        
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-300">
+            Paste Spotify callback URL here:
+          </label>
+          <textarea
+            value={callbackUrl}
+            onChange={(e) => setCallbackUrl(e.target.value)}
+            placeholder="https://your-repl.replit.dev/api/spotify-callback?code=..."
+            className="input-modern w-full h-24 resize-none"
+          />
+        </div>
+        
+        <button
+          onClick={handleAuthenticate}
+          disabled={isLoading || !callbackUrl.trim()}
+          className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isLoading ? 'Authenticating...' : '🔑 Complete Authentication'}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default AuthSection;

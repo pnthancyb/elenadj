@@ -1092,11 +1092,48 @@ if __name__ == "__main__":
     except ImportError:
         logger.info("python-dotenv not available, using system environment")
 
-    app = create_gradio_interface()
-    app.launch(
-        server_name="0.0.0.0",
-        server_port=8080,
-        share=False,
-        debug=True,
-        show_error=True
-    )
+    import subprocess
+    import threading
+    import time
+    import os
+
+    def run_backend():
+        """Run the Flask backend server"""
+        logger.info("Starting Flask backend server...")
+        subprocess.run(["python", "backend.py"], cwd=os.getcwd())
+
+    def build_and_serve_frontend():
+        """Build and serve the React frontend"""
+        try:
+            logger.info("Building React frontend...")
+            # Build the React app
+            build_result = subprocess.run(["npm", "run", "build"], 
+                                        cwd=os.getcwd(), 
+                                        capture_output=True, 
+                                        text=True)
+            
+            if build_result.returncode != 0:
+                logger.error(f"Build failed: {build_result.stderr}")
+                logger.info("Frontend build failed, backend will serve fallback page")
+            else:
+                logger.info("React frontend built successfully")
+                
+        except FileNotFoundError:
+            logger.error("npm not found. Please ensure Node.js is installed.")
+            logger.info("Backend will serve fallback page")
+        except Exception as e:
+            logger.error(f"Frontend build error: {e}")
+            logger.info("Backend will serve fallback page")
+
+    # Build frontend first
+    build_and_serve_frontend()
+    
+    # Give a moment for build to complete
+    time.sleep(2)
+    
+    # Start backend server (this will also serve the built React app)
+    logger.info("Starting Elena DJ Full Stack Application...")
+    logger.info("Backend API: http://0.0.0.0:5000")
+    logger.info("Frontend will be served by backend at: http://0.0.0.0:5000")
+    
+    run_backend()

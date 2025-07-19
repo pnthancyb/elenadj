@@ -20,3 +20,24 @@ const Footer = () => {
 };
 
 export default Footer;
+import React from 'react';
+
+const Footer = () => {
+  return (
+    <div className="mt-16 text-center">
+      <div className="card">
+        <div className="border-t border-gray-700 pt-8">
+          <h3 className="text-xl font-semibold mb-2">👨‍💻 Created by Han</h3>
+          <p className="text-gray-300 mb-2">
+            <strong>Elena - Your DJ</strong> © 2024 • Built with ❤️ for Elena • Powered by AI & Music
+          </p>
+          <p className="text-gray-400 text-sm italic">
+            A sophisticated music companion that transforms emotions into perfect playlists
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Footer;

@@ -8,47 +8,46 @@ const CustomTab = ({ isAuthenticated }) => {
   const [userPrompt, setUserPrompt] = useState('');
   const [numSongs, setNumSongs] = useState(25);
   const [language, setLanguage] = useState('Auto-detect');
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
 
   const languages = [
-    'Auto-detect', 'English', 'Spanish', 'French', 'German', 'Italian', 
+    'Auto-detect', 'English', 'Spanish', 'French', 'German', 'Italian',
     'Portuguese', 'Turkish', 'Japanese', 'Korean', 'Arabic', 'Hindi'
   ];
 
   const examples = [
-    { prompt: "Cozy coffee shop atmosphere with indie and acoustic vibes", songs: 20, lang: "English" },
-    { prompt: "Epic workout motivation with high-energy electronic beats", songs: 30, lang: "English" },
-    { prompt: "Romantic dinner background music with smooth jazz and soul", songs: 15, lang: "English" },
-    { prompt: "Deep focus music for coding and productivity sessions", songs: 40, lang: "English" },
-    { prompt: "Driving at night through the city with synthwave vibes", songs: 25, lang: "English" },
-    { prompt: "Sabah rutini için neşeli ve enerjik Türkçe şarkılar", songs: 25, lang: "Turkish" },
-    { prompt: "Relaxing spa and meditation soundscape", songs: 35, lang: "English" },
-    { prompt: "90s nostalgia trip with the best hits from that decade", songs: 45, lang: "English" }
+    ['Cozy coffee shop atmosphere with indie and acoustic vibes', 20, 'English'],
+    ['Epic workout motivation with high-energy electronic beats', 30, 'English'],
+    ['Romantic dinner background music with smooth jazz and soul', 15, 'English'],
+    ['Deep focus music for coding and productivity sessions', 40, 'English'],
+    ['Driving at night through the city with synthwave vibes', 25, 'English'],
+    ['Sabah rutini için neşeli ve enerjik Türkçe şarkılar', 25, 'Turkish']
   ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!userPrompt.trim() || userPrompt.trim().length < 5) {
+    if (!userPrompt.trim() || userPrompt.length < 5) {
       toast.error('Please provide a detailed description of your desired playlist!');
       return;
     }
 
     if (!isAuthenticated) {
       try {
-        const response = await getAuthUrl();
-        window.open(response.auth_url, '_blank');
+        const data = await getAuthUrl();
+        window.open(data.auth_url, '_blank');
         toast.error('Please authenticate with Spotify first');
       } catch (error) {
-        toast.error('Authentication required');
+        toast.error('Please authenticate with Spotify first');
       }
       return;
     }
 
+    setIsLoading(true);
+    setResult(null);
+
     try {
-      setLoading(true);
-      setResult(null);
       const response = await createCustomPlaylist(userPrompt, numSongs, language);
       setResult(response);
       toast.success('Custom playlist created successfully!');
@@ -59,26 +58,22 @@ const CustomTab = ({ isAuthenticated }) => {
         toast.error(error.response?.data?.error || 'Failed to create playlist');
       }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleExampleClick = (example) => {
-    setUserPrompt(example.prompt);
-    setNumSongs(example.songs);
-    setLanguage(example.lang);
-  };
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="card">
-        <div className="flex items-center mb-4">
-          <Bot className="w-6 h-6 mr-3 text-blue-400" />
-          <h2 className="text-2xl font-bold">AI-Powered Custom Playlists</h2>
-        </div>
-        <p className="text-gray-400 mb-6">Describe any playlist concept and let Elena's AI create the perfect tracklist</p>
+        <h3 className="text-2xl font-bold mb-4 flex items-center">
+          <Bot className="w-6 h-6 mr-2" />
+          AI-Powered Custom Playlists
+        </h3>
+        <p className="text-gray-300 mb-6">
+          Describe any playlist concept and let Elena's AI create the perfect tracklist
+        </p>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               🎯 Describe your playlist concept:
@@ -88,7 +83,6 @@ const CustomTab = ({ isAuthenticated }) => {
               onChange={(e) => setUserPrompt(e.target.value)}
               placeholder="Examples: 'Epic road trip through mountains' • 'Cozy coffee shop atmosphere' • 'Intense workout motivation' • 'Late night coding session'"
               className="input-modern w-full h-32 resize-none"
-              required
             />
           </div>
           
@@ -103,12 +97,12 @@ const CustomTab = ({ isAuthenticated }) => {
                 max="50"
                 step="5"
                 value={numSongs}
-                onChange={(e) => setNumSongs(Number(e.target.value))}
-                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                onChange={(e) => setNumSongs(parseInt(e.target.value))}
+                className="w-full"
               />
               <div className="flex justify-between text-sm text-gray-400 mt-1">
                 <span>10</span>
-                <span className="font-semibold text-white">{numSongs}</span>
+                <span className="font-medium text-white">{numSongs}</span>
                 <span>50</span>
               </div>
             </div>
@@ -123,9 +117,7 @@ const CustomTab = ({ isAuthenticated }) => {
                 className="input-modern w-full"
               >
                 {languages.map((lang) => (
-                  <option key={lang} value={lang} className="bg-gray-800">
-                    {lang}
-                  </option>
+                  <option key={lang} value={lang}>{lang}</option>
                 ))}
               </select>
             </div>
@@ -133,94 +125,104 @@ const CustomTab = ({ isAuthenticated }) => {
           
           <button
             type="submit"
-            disabled={loading || !isAuthenticated}
-            className="btn-primary w-full flex items-center justify-center space-x-2 text-lg py-4"
+            disabled={isLoading || !userPrompt.trim() || userPrompt.length < 5}
+            className="btn-primary w-full flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? (
+            {isLoading ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div>
-                <span>Creating Your AI Playlist...</span>
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-black border-t-transparent mr-2"></div>
+                Generating AI Playlist...
               </>
             ) : (
               <>
-                <Play className="w-5 h-5" />
-                <span>Generate AI Playlist</span>
+                <Play className="w-5 h-5 mr-2" />
+                🎵 Generate AI Playlist
               </>
             )}
           </button>
         </form>
-
+        
         {!isAuthenticated && (
-          <div className="mt-4 p-3 bg-yellow-900/30 border border-yellow-600 rounded-lg flex items-start space-x-2">
-            <AlertCircle className="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" />
+          <div className="mt-4 p-4 bg-yellow-900 border border-yellow-700 rounded-lg flex items-start">
+            <AlertCircle className="w-5 h-5 text-yellow-400 mt-0.5 mr-3 flex-shrink-0" />
             <p className="text-yellow-200 text-sm">
-              Please authenticate with Spotify first to create playlists.
+              Please authenticate with Spotify above to generate playlists.
             </p>
           </div>
         )}
       </div>
 
       {result && (
-        <div className="card bg-gradient-to-br from-blue-900/20 to-purple-900/20 border-blue-800">
-          <h3 className="text-xl font-bold text-blue-400 mb-4">
-            🎧 {result.playlist.playlist_name} is ready!
-          </h3>
+        <div className="card">
+          <h4 className="text-xl font-bold text-green-400 mb-4">
+            🎧 {result.playlist.playlist_name}
+          </h4>
           
           <div className="space-y-4">
             <div>
               <p className="text-gray-300">
-                <strong>🤖 AI Generated Concept:</strong> {result.playlist_concept.description}
+                <strong>AI Generated Concept:</strong> {result.playlist_concept.description}
               </p>
               <p className="text-gray-300">
-                <strong>🌍 Language:</strong> {language}
+                <strong>Language:</strong> {language}
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <div>
-                <p className="text-gray-300 mb-2"><strong>📊 Playlist Details:</strong></p>
-                <ul className="text-sm text-gray-400 space-y-1">
-                  <li>• {result.playlist.track_count} tracks</li>
-                  <li>• Genres: {result.playlist_concept.genres.join(', ')}</li>
-                  <li>• Themes: {result.playlist_concept.themes?.join(', ') || 'N/A'}</li>
-                </ul>
+                <strong className="text-white">Tracks:</strong>
+                <p className="text-gray-300">{result.playlist.track_count} songs</p>
               </div>
-              
               <div>
-                <p className="text-gray-300 mb-2"><strong>🎵 Sample Tracks:</strong></p>
-                <ul className="text-sm text-gray-400 space-y-1">
-                  {result.playlist.sample_tracks.map((track, index) => (
-                    <li key={index}>• {track}</li>
-                  ))}
-                </ul>
+                <strong className="text-white">Genres:</strong>
+                <p className="text-gray-300">{result.playlist_concept.genres.join(', ')}</p>
               </div>
+              <div>
+                <strong className="text-white">Themes:</strong>
+                <p className="text-gray-300">{result.playlist_concept.themes?.join(', ') || 'Various'}</p>
+              </div>
+            </div>
+            
+            <div>
+              <strong className="text-white">Sample Tracks:</strong>
+              <ul className="list-disc list-inside text-gray-300 mt-2">
+                {result.playlist.sample_tracks.map((track, index) => (
+                  <li key={index}>{track}</li>
+                ))}
+              </ul>
             </div>
             
             <a
               href={result.playlist.playlist_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary inline-flex items-center space-x-2"
+              className="btn-primary inline-flex items-center"
             >
-              <ExternalLink className="w-5 h-5" />
-              <span>🎧 Open in Spotify</span>
+              <ExternalLink className="w-4 h-4 mr-2" />
+              🎧 Open in Spotify
             </a>
           </div>
         </div>
       )}
-
-      <div className="card bg-gray-800/50">
-        <h3 className="text-lg font-semibold mb-4">💡 Try These Playlist Concepts:</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      
+      {/* Examples */}
+      <div className="card bg-gray-800">
+        <h4 className="text-lg font-semibold mb-4">💡 Try These Playlist Concepts:</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           {examples.map((example, index) => (
             <button
               key={index}
-              onClick={() => handleExampleClick(example)}
-              className="text-left p-3 bg-gray-900 hover:bg-gray-800 border border-gray-700 rounded-lg transition-colors text-sm"
+              onClick={() => {
+                setUserPrompt(example[0]);
+                setNumSongs(example[1]);
+                setLanguage(example[2]);
+              }}
+              className="text-left p-3 rounded bg-gray-700 hover:bg-gray-600 transition-colors text-sm"
             >
-              <div className="text-gray-300">{example.prompt}</div>
-              <div className="text-gray-500 text-xs mt-1">
-                {example.songs} songs • {example.lang}
+              <span className="text-gray-300">"{example[0]}"</span>
+              <div className="flex justify-between text-gray-500 text-xs mt-1">
+                <span>{example[1]} songs</span>
+                <span>{example[2]}</span>
               </div>
             </button>
           ))}
