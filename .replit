@@ -7,3 +7,15 @@ packages = ["ffmpeg-full"]
 [[ports]]
 localPort = 8080
 externalPort = 80
+
+[workflows]
+runButton = "Run Elena DJ"
+
+[[workflows.workflow]]
+name = "Run Elena DJ"
+author = 45246745
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py"

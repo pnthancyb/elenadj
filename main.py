@@ -608,8 +608,8 @@ def create_gradio_interface():
         primary_hue="emerald",
         secondary_hue="slate",
         neutral_hue="slate",
-        font=gr.themes.GoogleFont("Inter"),
-        font_mono=gr.themes.GoogleFont("JetBrains Mono"),
+        font=[gr.themes.GoogleFont("Inter")],
+        font_mono=[gr.themes.GoogleFont("JetBrains Mono")],
     ).set(
         body_background_fill="*neutral_950",
         body_background_fill_dark="*neutral_950",
@@ -640,8 +640,8 @@ def create_gradio_interface():
         primary_hue="emerald",
         secondary_hue="gray",
         neutral_hue="gray",
-        font=gr.themes.GoogleFont("Inter"),
-        font_mono=gr.themes.GoogleFont("JetBrains Mono"),
+        font=[gr.themes.GoogleFont("Inter")],
+        font_mono=[gr.themes.GoogleFont("JetBrains Mono")],
     ).set(
         body_background_fill="*neutral_50",
         background_fill_primary="*neutral_100",
