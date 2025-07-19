@@ -615,23 +615,23 @@ def create_gradio_interface():
         font=[gr.themes.GoogleFont("Inter")],
         font_mono=[gr.themes.GoogleFont("JetBrains Mono")],
     ).set(
-        body_background_fill="white",
-        background_fill_primary="white",
-        background_fill_secondary="#f8f9fa",
-        border_color_primary="#dee2e6",
-        button_primary_background_fill="#000000",
-        button_primary_background_fill_hover="#333333",
-        button_primary_text_color="white",
-        button_secondary_background_fill="#f8f9fa",
-        button_secondary_background_fill_hover="#e9ecef",
-        input_background_fill="white",
-        input_background_fill_focus="white",
-        input_border_color="#dee2e6",
-        input_border_color_focus="#000000",
-        block_background_fill="white",
-        block_border_color="#dee2e6",
-        panel_background_fill="#f8f9fa",
-        slider_color="#000000",
+        body_background_fill="#000000",
+        background_fill_primary="#000000",
+        background_fill_secondary="#1a1a1a",
+        border_color_primary="#333333",
+        button_primary_background_fill="#ffffff",
+        button_primary_background_fill_hover="#e6e6e6",
+        button_primary_text_color="black",
+        button_secondary_background_fill="#1a1a1a",
+        button_secondary_background_fill_hover="#333333",
+        input_background_fill="#1a1a1a",
+        input_background_fill_focus="#1a1a1a",
+        input_border_color="#333333",
+        input_border_color_focus="#ffffff",
+        block_background_fill="#1a1a1a",
+        block_border_color="#333333",
+        panel_background_fill="#0d0d0d",
+        slider_color="#ffffff",
     )
 
     # Simple CSS for black and white interface
@@ -641,18 +641,19 @@ def create_gradio_interface():
         max-width: 1000px !important;
         margin: 0 auto !important;
         font-family: 'Inter', sans-serif !important;
-        background: white !important;
+        background: #000000 !important;
+        color: white !important;
     }
     
     /* Header styling */
     .header-container {
         text-align: center;
         padding: 2rem;
-        background: #000000;
+        background: #1a1a1a;
         border-radius: 8px;
         margin-bottom: 2rem;
         color: white;
-        border: 2px solid #000000;
+        border: 2px solid #333333;
     }
     
     .header-title {
@@ -673,17 +674,18 @@ def create_gradio_interface():
     
     /* Card styling */
     .card {
-        background: white;
-        border: 1px solid #dee2e6;
+        background: #1a1a1a;
+        border: 1px solid #333333;
         border-radius: 8px;
         padding: 1.5rem;
         margin: 1rem 0;
+        color: white;
     }
     
     /* Auth card styling */
     .auth-card {
-        border: 2px solid #000000;
-        background: white;
+        border: 2px solid #333333;
+        background: #1a1a1a;
     }
     
     /* Button styling */
@@ -692,14 +694,14 @@ def create_gradio_interface():
         font-size: 1rem !important;
         padding: 0.75rem 1.5rem !important;
         border-radius: 4px !important;
-        background: #000000 !important;
-        color: white !important;
-        border: 2px solid #000000 !important;
+        background: #ffffff !important;
+        color: black !important;
+        border: 2px solid #ffffff !important;
     }
     
     .elena-btn:hover {
-        background: #333333 !important;
-        border-color: #333333 !important;
+        background: #e6e6e6 !important;
+        border-color: #e6e6e6 !important;
     }
     
     /* Tab styling */
@@ -750,11 +752,12 @@ def create_gradio_interface():
     
     /* Examples styling */
     .examples-container {
-        background: #f8f9fa;
+        background: #0d0d0d;
         border-radius: 8px;
         padding: 1rem;
         margin-top: 1rem;
-        border: 1px solid #dee2e6;
+        border: 1px solid #333333;
+        color: white;
     }
     
     /* Features grid */
@@ -823,12 +826,13 @@ def create_gradio_interface():
         border-radius: 4px !important;
         padding: 0.75rem !important;
         font-size: 1rem !important;
-        border: 1px solid #dee2e6 !important;
-        background: white !important;
+        border: 1px solid #333333 !important;
+        background: #1a1a1a !important;
+        color: white !important;
     }
     
     .modern-input:focus {
-        border-color: #000000 !important;
+        border-color: #ffffff !important;
     }
     """
 
