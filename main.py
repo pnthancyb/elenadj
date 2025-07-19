@@ -8,7 +8,6 @@ A sophisticated music companion that transforms your emotions and ideas into per
 import json
 import os
 import re
-import hashlib
 import gradio as gr
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
@@ -18,7 +17,6 @@ import logging
 import sys
 import urllib.parse
 from typing import Dict, List, Optional, Tuple
-import random
 
 # Configure logging
 logging.basicConfig(level=logging.INFO,
