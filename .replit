@@ -9,7 +9,7 @@ localPort = 8080
 externalPort = 80
 
 [workflows]
-runButton = "Run Elena DJ"
+runButton = "Elena DJ Full Stack"
 
 [[workflows.workflow]]
 name = "Run Elena DJ"
@@ -19,3 +19,16 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python main.py"
+
+[[workflows.workflow]]
+name = "Elena DJ Full Stack"
+author = 45246745
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd . && python backend.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd . && npm start"
