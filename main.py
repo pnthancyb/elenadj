@@ -517,6 +517,10 @@ class ElenaDJ:
 3. Try creating your playlist again!
             """
 
+        # Handle auto-detect language
+        if language == "Auto-detect":
+            language = "English"
+
         playlist_concept = self.generate_custom_playlist_ai(user_prompt, num_songs, language)
         if "error" in playlist_concept:
             return f"❌ {playlist_concept['error']}"
@@ -603,142 +607,99 @@ def create_gradio_interface():
         "Portuguese", "Turkish", "Japanese", "Korean", "Arabic", "Hindi"
     ]
 
-    # Create themes
-    dark_theme = gr.themes.Base(
-        primary_hue="emerald",
-        secondary_hue="slate",
-        neutral_hue="slate",
-        font=[gr.themes.GoogleFont("Inter")],
-        font_mono=[gr.themes.GoogleFont("JetBrains Mono")],
-    ).set(
-        body_background_fill="*neutral_950",
-        body_background_fill_dark="*neutral_950",
-        background_fill_primary="*neutral_900",
-        background_fill_primary_dark="*neutral_900",
-        background_fill_secondary="*neutral_800", 
-        background_fill_secondary_dark="*neutral_800",
-        border_color_primary="*primary_600",
-        border_color_primary_dark="*primary_600",
-        button_primary_background_fill="*primary_600",
-        button_primary_background_fill_hover="*primary_500",
-        button_primary_text_color="*neutral_900",
-        button_secondary_background_fill="*neutral_700",
-        button_secondary_background_fill_hover="*neutral_600",
-        input_background_fill="*neutral_800",
-        input_background_fill_focus="*neutral_700",
-        input_border_color="*neutral_600",
-        input_border_color_focus="*primary_500",
-        block_background_fill="*neutral_800",
-        block_border_color="*neutral_600",
-        panel_background_fill="*neutral_850",
-        slider_color="*primary_600",
-        checkbox_background_color="*primary_600",
-        checkbox_background_color_selected="*primary_500",
-    )
-
-    light_theme = gr.themes.Base(
-        primary_hue="emerald",
+    # Simple black and white theme
+    simple_theme = gr.themes.Base(
+        primary_hue="slate",
         secondary_hue="gray",
         neutral_hue="gray",
         font=[gr.themes.GoogleFont("Inter")],
         font_mono=[gr.themes.GoogleFont("JetBrains Mono")],
     ).set(
-        body_background_fill="*neutral_50",
-        background_fill_primary="*neutral_100",
-        background_fill_secondary="*neutral_200",
-        border_color_primary="*primary_500",
-        button_primary_background_fill="*primary_600",
-        button_primary_background_fill_hover="*primary_500",
+        body_background_fill="white",
+        background_fill_primary="white",
+        background_fill_secondary="#f8f9fa",
+        border_color_primary="#dee2e6",
+        button_primary_background_fill="#000000",
+        button_primary_background_fill_hover="#333333",
         button_primary_text_color="white",
-        button_secondary_background_fill="*neutral_200",
-        button_secondary_background_fill_hover="*neutral_300",
+        button_secondary_background_fill="#f8f9fa",
+        button_secondary_background_fill_hover="#e9ecef",
         input_background_fill="white",
-        input_background_fill_focus="*neutral_50",
-        input_border_color="*neutral_300",
-        input_border_color_focus="*primary_400",
+        input_background_fill_focus="white",
+        input_border_color="#dee2e6",
+        input_border_color_focus="#000000",
         block_background_fill="white",
-        block_border_color="*neutral_200",
-        panel_background_fill="*neutral_50",
-        slider_color="*primary_500",
+        block_border_color="#dee2e6",
+        panel_background_fill="#f8f9fa",
+        slider_color="#000000",
     )
 
-    # Custom CSS for enhanced styling
+    # Simple CSS for black and white interface
     custom_css = """
     /* Global styles */
     .gradio-container {
-        max-width: 1200px !important;
+        max-width: 1000px !important;
         margin: 0 auto !important;
         font-family: 'Inter', sans-serif !important;
+        background: white !important;
     }
     
     /* Header styling */
     .header-container {
         text-align: center;
         padding: 2rem;
-        background: linear-gradient(135deg, #065f46 0%, #059669 50%, #10b981 100%);
-        border-radius: 1rem;
+        background: #000000;
+        border-radius: 8px;
         margin-bottom: 2rem;
         color: white;
-        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        border: 2px solid #000000;
     }
     
     .header-title {
-        font-size: 3.5rem !important;
-        font-weight: 900 !important;
+        font-size: 2.5rem !important;
+        font-weight: 700 !important;
         margin-bottom: 1rem !important;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
     
     .header-subtitle {
-        font-size: 1.5rem !important;
+        font-size: 1.2rem !important;
         font-weight: 400 !important;
-        opacity: 0.9;
         margin-bottom: 0.5rem !important;
     }
     
     .header-description {
-        font-size: 1.1rem !important;
-        opacity: 0.8;
+        font-size: 1rem !important;
     }
     
     /* Card styling */
     .card {
-        background: var(--block-background-fill);
-        border: 2px solid var(--border-color-primary);
-        border-radius: 1rem;
-        padding: 2rem;
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
         margin: 1rem 0;
-        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
-        transition: all 0.3s ease;
     }
     
-    .card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 30px rgba(16, 185, 129, 0.2);
-        border-color: var(--primary-500);
-    }
-    
-    /* Auth card special styling */
+    /* Auth card styling */
     .auth-card {
-        border: 2px solid #10b981;
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.1) 100%);
+        border: 2px solid #000000;
+        background: white;
     }
     
     /* Button styling */
     .elena-btn {
-        font-weight: 700 !important;
-        font-size: 1.1rem !important;
-        padding: 1rem 2rem !important;
-        border-radius: 0.75rem !important;
-        transition: all 0.3s ease !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.5px !important;
-        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+        padding: 0.75rem 1.5rem !important;
+        border-radius: 4px !important;
+        background: #000000 !important;
+        color: white !important;
+        border: 2px solid #000000 !important;
     }
     
     .elena-btn:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
+        background: #333333 !important;
+        border-color: #333333 !important;
     }
     
     /* Tab styling */
@@ -787,26 +748,13 @@ def create_gradio_interface():
         line-height: 1.6;
     }
     
-    /* Theme switch button */
-    .theme-switch {
-        position: fixed;
-        top: 1rem;
-        right: 1rem;
-        z-index: 1000;
-        border-radius: 50% !important;
-        width: 60px !important;
-        height: 60px !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
-        font-size: 1.5rem !important;
-    }
-    
     /* Examples styling */
     .examples-container {
-        background: var(--background-fill-secondary);
-        border-radius: 1rem;
-        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
         margin-top: 1rem;
-        border: 1px solid var(--border-color-primary);
+        border: 1px solid #dee2e6;
     }
     
     /* Features grid */
@@ -870,38 +818,23 @@ def create_gradio_interface():
         }
     }
     
-    /* Animations */
-    @keyframes glow {
-        0%, 100% { box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
-        50% { box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5); }
+    /* Input styling */
+    .modern-input {
+        border-radius: 4px !important;
+        padding: 0.75rem !important;
+        font-size: 1rem !important;
+        border: 1px solid #dee2e6 !important;
+        background: white !important;
     }
     
-    .elena-btn:hover {
-        animation: glow 2s ease-in-out infinite;
-    }
-    
-    /* Dark mode specific adjustments */
-    [data-theme="dark"] .header-container {
-        background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
-    }
-    
-    /* Light mode header adjustment */
-    [data-theme="light"] .header-container {
-        background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
-        color: white;
+    .modern-input:focus {
+        border-color: #000000 !important;
     }
     """
 
-    # State for theme switching
-    current_theme = gr.State("dark")
-
-    def switch_theme(theme_state):
-        new_theme = "light" if theme_state == "dark" else "dark"
-        return new_theme, new_theme
-
     with gr.Blocks(
         title="Elena - Your DJ",
-        theme=dark_theme,
+        theme=simple_theme,
         css=custom_css,
         head="""
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -921,8 +854,7 @@ def create_gradio_interface():
             </div>
             """)
 
-        # Theme switcher
-        theme_btn = gr.Button("🌙", elem_classes=["theme-switch"], scale=0)
+        
 
         # Quick setup guide
         with gr.Group(elem_classes=["card"]):
@@ -1015,30 +947,32 @@ def create_gradio_interface():
                     gr.Markdown("### 🤖 AI-Powered Custom Playlists")
                     gr.Markdown("Describe any playlist concept and let Elena's AI create the perfect tracklist")
                     
+                    custom_prompt = gr.Textbox(
+                        label="🎯 Describe your playlist concept:",
+                        placeholder="Examples: 'Epic road trip through mountains' • 'Cozy coffee shop atmosphere' • 'Intense workout motivation' • 'Late night coding session'",
+                        lines=4,
+                        elem_classes=["modern-input"]
+                    )
+                    
                     with gr.Row():
-                        with gr.Column(scale=3):
-                            custom_prompt = gr.Textbox(
-                                label="🎯 Describe your playlist concept:",
-                                placeholder="Examples: 'Epic road trip through mountains' • 'Cozy coffee shop atmosphere' • 'Intense workout motivation' • 'Late night coding session'",
-                                lines=4,
+                        with gr.Column(scale=2):
+                            custom_songs = gr.Slider(
+                                label="🎵 Number of Songs",
+                                minimum=10,
+                                maximum=50,
+                                value=25,
+                                step=5,
                                 elem_classes=["modern-input"]
                             )
                         with gr.Column(scale=1):
                             custom_language = gr.Dropdown(
-                                label="🌍 Music Language",
-                                choices=language_options,
-                                value="English",
+                                label="🌍 Music Language (Optional)",
+                                choices=["Auto-detect"] + language_options,
+                                value="Auto-detect",
                                 elem_classes=["modern-input"]
                             )
                     
-                    custom_songs = gr.Slider(
-                        label="🎵 Number of Songs",
-                        minimum=10,
-                        maximum=50,
-                        value=25,
-                        step=5,
-                        elem_classes=["modern-input"]
-                    )
+                    
                     
                     custom_generate_btn = gr.Button(
                         "🎵 Generate AI Playlist",
@@ -1116,13 +1050,6 @@ def create_gradio_interface():
             """, elem_classes=["text-center"])
 
         # Event handlers
-        theme_btn.click(
-            fn=switch_theme,
-            inputs=[current_theme],
-            outputs=[current_theme, app],
-            show_progress=False
-        )
-
         auth_btn.click(
             fn=elena_dj.handle_authentication,
             inputs=auth_url_input,
