@@ -1,8 +1,8 @@
-modules = ["python-3.12"]
+modules = ["python-3.12", "nodejs-20"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["ffmpeg-full"]
+packages = ["ffmpeg-full", "nodejs-20_x", "npm-10_x"]
 
 [[ports]]
 localPort = 5000
@@ -36,3 +36,16 @@ args = "npm run build"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd . && python backend.py & cd . && npm start"
+
+[[workflows.workflow]]
+name = "Development Mode"
+author = 45246745
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python backend.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm start"
