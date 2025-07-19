@@ -453,9 +453,44 @@ elena_dj = ElenaDJ()
 @app.route('/')
 def serve():
     try:
-        return send_from_directory(app.static_folder, 'index.html')
+        if os.path.exists(os.path.join(app.static_folder, 'index.html')):
+            return send_from_directory(app.static_folder, 'index.html')
+        else:
+            return '''
+            <!DOCTYPE html>
+            <html lang="tr">
+            <head>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <title>Elena DJ - Backend Running</title>
+                <style>
+                    body { font-family: Arial, sans-serif; background: #000; color: #fff; padding: 2rem; text-align: center; }
+                    .container { max-width: 800px; margin: 0 auto; }
+                    .status { background: #1a1a1a; padding: 2rem; border-radius: 8px; margin: 1rem 0; }
+                    .success { color: #10b981; }
+                    .warning { color: #f59e0b; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>🎵 Elena DJ Backend Çalışıyor!</h1>
+                    <div class="status">
+                        <p class="success">✅ Backend API başarıyla çalışıyor (Port 5000)</p>
+                        <p class="warning">⚠️ Frontend build bulunamadı</p>
+                        <p>Çözüm için şu adımları takip edin:</p>
+                        <ol style="text-align: left; display: inline-block;">
+                            <li><code>npm install</code> komutunu çalıştırın</li>
+                            <li><code>npm run build</code> ile React uygulamasını build edin</li>
+                            <li>Sayfayı yenileyin</li>
+                        </ol>
+                    </div>
+                    <p>API Endpoints: <a href="/api/auth-url" style="color: #10b981;">/api/auth-url</a></p>
+                </div>
+            </body>
+            </html>
+            ''', 200
     except Exception as e:
-        return f"<h1>Elena DJ Backend is running!</h1><p>Frontend build not found. The React app should be running on port 3000.</p><p>API is available at /api/</p><p>Error: {str(e)}</p>", 200
+        return f"<h1>Elena DJ Backend Error</h1><p>Error: {str(e)}</p>", 500
 
 @app.route('/<path:path>')
 def serve_static(path):
