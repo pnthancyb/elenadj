@@ -570,7 +570,7 @@ class ElenaDJ:
 
 
 def create_gradio_interface():
-    """Create the Elena - Your DJ interface with green and black theme"""
+    """Create the modern Elena - Your DJ interface with theme switcher"""
 
     try:
         elena_dj = ElenaDJ()
@@ -597,537 +597,534 @@ def create_gradio_interface():
 
         elena_dj = MockElenaDJ()
 
-    # Enhanced language options
+    # Language options
     language_options = [
         "English", "Spanish", "French", "German", "Italian", 
         "Portuguese", "Turkish", "Japanese", "Korean", "Arabic", "Hindi"
     ]
 
+    # Create themes
+    dark_theme = gr.themes.Base(
+        primary_hue="emerald",
+        secondary_hue="slate",
+        neutral_hue="slate",
+        font=gr.themes.GoogleFont("Inter"),
+        font_mono=gr.themes.GoogleFont("JetBrains Mono"),
+    ).set(
+        body_background_fill="*neutral_950",
+        body_background_fill_dark="*neutral_950",
+        background_fill_primary="*neutral_900",
+        background_fill_primary_dark="*neutral_900",
+        background_fill_secondary="*neutral_800", 
+        background_fill_secondary_dark="*neutral_800",
+        border_color_primary="*primary_600",
+        border_color_primary_dark="*primary_600",
+        button_primary_background_fill="*primary_600",
+        button_primary_background_fill_hover="*primary_500",
+        button_primary_text_color="*neutral_900",
+        button_secondary_background_fill="*neutral_700",
+        button_secondary_background_fill_hover="*neutral_600",
+        input_background_fill="*neutral_800",
+        input_background_fill_focus="*neutral_700",
+        input_border_color="*neutral_600",
+        input_border_color_focus="*primary_500",
+        block_background_fill="*neutral_800",
+        block_border_color="*neutral_600",
+        panel_background_fill="*neutral_850",
+        slider_color="*primary_600",
+        checkbox_background_color="*primary_600",
+        checkbox_background_color_selected="*primary_500",
+    )
+
+    light_theme = gr.themes.Base(
+        primary_hue="emerald",
+        secondary_hue="gray",
+        neutral_hue="gray",
+        font=gr.themes.GoogleFont("Inter"),
+        font_mono=gr.themes.GoogleFont("JetBrains Mono"),
+    ).set(
+        body_background_fill="*neutral_50",
+        background_fill_primary="*neutral_100",
+        background_fill_secondary="*neutral_200",
+        border_color_primary="*primary_500",
+        button_primary_background_fill="*primary_600",
+        button_primary_background_fill_hover="*primary_500",
+        button_primary_text_color="white",
+        button_secondary_background_fill="*neutral_200",
+        button_secondary_background_fill_hover="*neutral_300",
+        input_background_fill="white",
+        input_background_fill_focus="*neutral_50",
+        input_border_color="*neutral_300",
+        input_border_color_focus="*primary_400",
+        block_background_fill="white",
+        block_border_color="*neutral_200",
+        panel_background_fill="*neutral_50",
+        slider_color="*primary_500",
+    )
+
+    # Custom CSS for enhanced styling
+    custom_css = """
+    /* Global styles */
+    .gradio-container {
+        max-width: 1200px !important;
+        margin: 0 auto !important;
+        font-family: 'Inter', sans-serif !important;
+    }
+    
+    /* Header styling */
+    .header-container {
+        text-align: center;
+        padding: 2rem;
+        background: linear-gradient(135deg, #065f46 0%, #059669 50%, #10b981 100%);
+        border-radius: 1rem;
+        margin-bottom: 2rem;
+        color: white;
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+    }
+    
+    .header-title {
+        font-size: 3.5rem !important;
+        font-weight: 900 !important;
+        margin-bottom: 1rem !important;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .header-subtitle {
+        font-size: 1.5rem !important;
+        font-weight: 400 !important;
+        opacity: 0.9;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .header-description {
+        font-size: 1.1rem !important;
+        opacity: 0.8;
+    }
+    
+    /* Card styling */
+    .card {
+        background: var(--block-background-fill);
+        border: 2px solid var(--border-color-primary);
+        border-radius: 1rem;
+        padding: 2rem;
+        margin: 1rem 0;
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(16, 185, 129, 0.2);
+        border-color: var(--primary-500);
+    }
+    
+    /* Auth card special styling */
+    .auth-card {
+        border: 2px solid #10b981;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.1) 100%);
+    }
+    
+    /* Button styling */
+    .elena-btn {
+        font-weight: 700 !important;
+        font-size: 1.1rem !important;
+        padding: 1rem 2rem !important;
+        border-radius: 0.75rem !important;
+        transition: all 0.3s ease !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
+    }
+    
+    .elena-btn:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
+    }
+    
+    /* Tab styling */
+    .tab-nav {
+        border-radius: 1rem 1rem 0 0;
+        overflow: hidden;
+    }
+    
+    .tab-nav button {
+        font-size: 1.2rem !important;
+        font-weight: 600 !important;
+        padding: 1rem 2rem !important;
+        border-radius: 0 !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .tab-nav button[aria-selected="true"] {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+        color: white !important;
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+    }
+    
+    /* Input styling */
+    .modern-input {
+        border-radius: 0.75rem !important;
+        padding: 1rem !important;
+        font-size: 1rem !important;
+        transition: all 0.3s ease !important;
+        border: 2px solid var(--input-border-color) !important;
+    }
+    
+    .modern-input:focus {
+        border-color: #10b981 !important;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+    }
+    
+    /* Output styling */
+    .output-card {
+        background: var(--panel-background-fill);
+        border: 1px solid var(--block-border-color);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        min-height: 100px;
+        font-family: 'Inter', sans-serif;
+        line-height: 1.6;
+    }
+    
+    /* Theme switch button */
+    .theme-switch {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1000;
+        border-radius: 50% !important;
+        width: 60px !important;
+        height: 60px !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+        font-size: 1.5rem !important;
+    }
+    
+    /* Examples styling */
+    .examples-container {
+        background: var(--background-fill-secondary);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        border: 1px solid var(--border-color-primary);
+    }
+    
+    /* Features grid */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .feature-card {
+        background: var(--background-fill-secondary);
+        border: 1px solid var(--border-color-primary);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-4px);
+        border-color: #10b981;
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.15);
+    }
+    
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* Status indicators */
+    .status-success {
+        color: #10b981;
+        font-weight: 600;
+    }
+    
+    .status-error {
+        color: #ef4444;
+        font-weight: 600;
+    }
+    
+    .status-warning {
+        color: #f59e0b;
+        font-weight: 600;
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .header-title {
+            font-size: 2.5rem !important;
+        }
+        
+        .card {
+            padding: 1rem;
+            margin: 0.5rem 0;
+        }
+        
+        .features-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+    }
+    
+    /* Animations */
+    @keyframes glow {
+        0%, 100% { box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+        50% { box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5); }
+    }
+    
+    .elena-btn:hover {
+        animation: glow 2s ease-in-out infinite;
+    }
+    
+    /* Dark mode specific adjustments */
+    [data-theme="dark"] .header-container {
+        background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
+    }
+    
+    /* Light mode header adjustment */
+    [data-theme="light"] .header-container {
+        background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+        color: white;
+    }
+    """
+
+    # State for theme switching
+    current_theme = gr.State("dark")
+
+    def switch_theme(theme_state):
+        new_theme = "light" if theme_state == "dark" else "dark"
+        return new_theme, new_theme
+
     with gr.Blocks(
         title="Elena - Your DJ",
-        theme=gr.themes.Base(),
-        css="""
-        /* Global Variables */
-        :root {
-            --primary-green: #00ff88;
-            --dark-green: #00cc66;
-            --light-green: #66ffaa;
-            --primary-black: #0a0a0a;
-            --secondary-black: #1a1a1a;
-            --tertiary-black: #2a2a2a;
-            --accent-green: #22ff88;
-            --text-white: #ffffff;
-            --text-light: #e0e0e0;
-            --text-green: #00ff88;
-            --border-green: #00ff88;
-            --shadow-green: rgba(0, 255, 136, 0.3);
-            --gradient-main: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
-            --gradient-accent: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
-            --gradient-card: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-        }
-        
-        /* Main Container */
-        .gradio-container {
-            max-width: 1400px !important;
-            margin: 0 auto !important;
-            font-family: 'SF Pro Display', 'Segoe UI', 'Roboto', sans-serif !important;
-            background: var(--gradient-main) !important;
-            min-height: 100vh !important;
-            color: var(--text-white) !important;
-        }
-        
-        /* Main Header */
-        .main-header {
-            text-align: center;
-            padding: 50px 30px;
-            background: var(--gradient-card);
-            border: 2px solid var(--border-green);
-            border-radius: 25px;
-            margin: 30px 0;
-            box-shadow: 0 25px 50px var(--shadow-green);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .main-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="music-pattern" x="0" y="0" width="25" height="25" patternUnits="userSpaceOnUse"><circle cx="5" cy="20" r="2" fill="rgba(0,255,136,0.1)"/><rect x="7" y="8" width="2" height="12" fill="rgba(0,255,136,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23music-pattern)"/></svg>') repeat;
-            opacity: 0.3;
-        }
-        
-        .main-header h1 {
-            margin: 0 0 20px 0 !important;
-            font-size: 4em !important;
-            font-weight: 900 !important;
-            background: var(--gradient-accent) !important;
-            background-clip: text !important;
-            -webkit-background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-            text-shadow: 0 0 30px var(--shadow-green) !important;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .main-header h3 {
-            margin: 15px 0 !important;
-            font-weight: 400 !important;
-            font-size: 1.4em !important;
-            color: var(--text-light) !important;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .subtitle {
-            font-size: 1.2em !important;
-            color: var(--text-green) !important;
-            margin-top: 15px !important;
-            position: relative;
-            z-index: 2;
-            font-weight: 500 !important;
-        }
-        
-        /* Setup Instructions */
-        .setup-warning {
-            background: var(--gradient-card) !important;
-            border: 2px solid var(--accent-green) !important;
-            border-radius: 20px !important;
-            padding: 30px !important;
-            margin: 25px 0 !important;
-            box-shadow: 0 15px 35px rgba(0, 255, 136, 0.2) !important;
-        }
-        
-        .setup-warning h2, .setup-warning h3, .setup-warning p {
-            color: var(--text-light) !important;
-        }
-        
-        .setup-warning strong {
-            color: var(--text-green) !important;
-        }
-        
-        /* Authentication Section */
-        .auth-section {
-            border: 3px solid var(--border-green) !important;
-            border-radius: 25px !important;
-            padding: 35px !important;
-            margin: 35px 0 !important;
-            background: var(--gradient-card) !important;
-            box-shadow: 0 20px 40px var(--shadow-green) !important;
-            position: relative;
-        }
-        
-        .auth-section::before {
-            content: '🔐';
-            position: absolute;
-            top: -20px;
-            left: 35px;
-            background: var(--gradient-accent);
-            color: var(--primary-black);
-            padding: 15px 20px;
-            border-radius: 50%;
-            font-size: 1.8em;
-            box-shadow: 0 10px 20px var(--shadow-green);
-        }
-        
-        /* Mode Sections */
-        .mode-section {
-            border-radius: 25px !important;
-            padding: 35px !important;
-            margin: 25px 0 !important;
-            background: var(--gradient-card) !important;
-            border: 2px solid var(--tertiary-black) !important;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5) !important;
-            transition: all 0.4s ease !important;
-        }
-        
-        .mode-section:hover {
-            transform: translateY(-8px) !important;
-            box-shadow: 0 25px 50px var(--shadow-green) !important;
-            border-color: var(--border-green) !important;
-        }
-        
-        /* Buttons */
-        .elena-btn {
-            background: var(--gradient-accent) !important;
-            color: var(--primary-black) !important;
-            border: none !important;
-            padding: 20px 40px !important;
-            font-size: 18px !important;
-            font-weight: 800 !important;
-            border-radius: 15px !important;
-            box-shadow: 0 10px 25px var(--shadow-green) !important;
-            transition: all 0.3s ease !important;
-            text-transform: uppercase !important;
-            letter-spacing: 1.5px !important;
-            position: relative !important;
-            overflow: hidden !important;
-        }
-        
-        .elena-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        .elena-btn:hover::before {
-            left: 100%;
-        }
-        
-        .elena-btn:hover {
-            transform: translateY(-4px) scale(1.05) !important;
-            box-shadow: 0 15px 35px var(--shadow-green) !important;
-        }
-        
-        /* Output Sections */
-        .output-section {
-            border-radius: 20px !important;
-            padding: 30px !important;
-            background: var(--gradient-card) !important;
-            margin-top: 30px !important;
-            border: 2px solid var(--tertiary-black) !important;
-            min-height: 120px !important;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
-            color: var(--text-white) !important;
-        }
-        
-        /* Tab Navigation */
-        .tab-nav button {
-            font-size: 18px !important;
-            font-weight: 700 !important;
-            padding: 18px 35px !important;
-            border-radius: 15px 15px 0 0 !important;
-            transition: all 0.3s ease !important;
-            background: var(--secondary-black) !important;
-            color: var(--text-light) !important;
-            border: 2px solid var(--tertiary-black) !important;
-            border-bottom: none !important;
-        }
-        
-        .tab-nav button[aria-selected="true"] {
-            background: var(--gradient-accent) !important;
-            color: var(--primary-black) !important;
-            border-color: var(--border-green) !important;
-            box-shadow: 0 -5px 15px var(--shadow-green) !important;
-        }
-        
-        /* Section Titles */
-        .section-title {
-            color: var(--text-green) !important;
-            font-weight: 800 !important;
-            margin-bottom: 25px !important;
-            font-size: 1.6em !important;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        /* Examples Section */
-        .examples-section {
-            background: var(--secondary-black) !important;
-            border-radius: 20px !important;
-            padding: 30px !important;
-            margin-top: 30px !important;
-            border: 2px solid var(--accent-green) !important;
-            box-shadow: 0 10px 25px rgba(0, 255, 136, 0.15) !important;
-        }
-        
-        .examples-section h3 {
-            color: var(--text-green) !important;
-        }
-        
-        /* Info Section */
-        .info-section {
-            background: var(--gradient-card) !important;
-            border-radius: 20px !important;
-            padding: 30px !important;
-            margin: 30px 0 !important;
-            border-left: 6px solid var(--border-green) !important;
-            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.2) !important;
-        }
-        
-        .info-section h2 {
-            color: var(--text-green) !important;
-        }
-        
-        .info-section p, .info-section li {
-            color: var(--text-light) !important;
-        }
-        
-        /* Creator Credit */
-        .creator-credit {
-            text-align: center !important;
-            margin-top: 50px !important;
-            padding: 25px !important;
-            background: var(--gradient-accent) !important;
-            color: var(--primary-black) !important;
-            border-radius: 20px !important;
-            font-weight: 700 !important;
-            font-size: 1.2em !important;
-            box-shadow: 0 15px 30px var(--shadow-green) !important;
-        }
-        
-        /* Form Inputs */
-        .input-enhanced {
-            border-radius: 15px !important;
-            border: 2px solid var(--tertiary-black) !important;
-            padding: 18px !important;
-            font-size: 16px !important;
-            transition: all 0.3s ease !important;
-            background: var(--secondary-black) !important;
-            color: var(--text-white) !important;
-        }
-        
-        .input-enhanced:focus {
-            border-color: var(--border-green) !important;
-            box-shadow: 0 0 0 3px var(--shadow-green) !important;
-            background: var(--primary-black) !important;
-        }
-        
-        /* Dropdown and Slider */
-        .gr-dropdown, .gr-slider {
-            background: var(--secondary-black) !important;
-            border: 2px solid var(--tertiary-black) !important;
-            border-radius: 15px !important;
-            color: var(--text-white) !important;
-        }
-        
-        .gr-dropdown:focus-within, .gr-slider:focus-within {
-            border-color: var(--border-green) !important;
-            box-shadow: 0 0 0 3px var(--shadow-green) !important;
-        }
-        
-        /* Labels */
-        label {
-            color: var(--text-light) !important;
-            font-weight: 600 !important;
-            margin-bottom: 8px !important;
-        }
-        
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--primary-black);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--gradient-accent);
-            border-radius: 5px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--dark-green);
-        }
-        
-        /* Animation for buttons */
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 10px 25px var(--shadow-green); }
-            50% { box-shadow: 0 15px 35px rgba(0, 255, 136, 0.5); }
-        }
-        
-        .elena-btn:hover {
-            animation: glow 2s ease-in-out infinite;
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .main-header h1 {
-                font-size: 2.5em !important;
-            }
-            
-            .mode-section {
-                padding: 25px !important;
-            }
-            
-            .auth-section {
-                padding: 25px !important;
-            }
-        }
+        theme=dark_theme,
+        css=custom_css,
+        head="""
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
         """
     ) as app:
 
-        # Enhanced main header with green theme
-        with gr.Row(elem_classes=["main-header"]):
+        # Header section
+        with gr.Group(elem_classes=["header-container"]):
+            gr.HTML("""
+            <div>
+                <h1 class="header-title">🎵 Elena - Your DJ</h1>
+                <p class="header-subtitle">AI-Powered Spotify Playlist Generator</p>
+                <p class="header-description">Transform your emotions and ideas into perfect playlists with advanced AI</p>
+            </div>
+            """)
+
+        # Theme switcher
+        theme_btn = gr.Button("🌙", elem_classes=["theme-switch"], scale=0)
+
+        # Quick setup guide
+        with gr.Group(elem_classes=["card"]):
             gr.Markdown("""
-            # 🎵 Elena - Your DJ
-            ### Transform your emotions and ideas into perfect playlists
-            **Your AI-powered music companion that understands your vibe**
-            <div class="subtitle">🤖 Powered by advanced AI algorithms • 🌍 Multi-language support • 🎵 Quality-filtered tracks</div>
-            """)
-
-        # Setup info with green styling
-        with gr.Group(elem_classes=["setup-warning"]):
-            gr.Markdown(f"""
-            **🔧 Setup Instructions:**
+            ## 🚀 Quick Setup Guide
             
-            1. **Add to Secrets** (🔒 icon in left sidebar):
-               - `GROQ_API_KEY`: Get free at [console.groq.com](https://console.groq.com/)
-               - `SPOTIFY_CLIENT_ID` & `SPOTIFY_CLIENT_SECRET`: Get at [developer.spotify.com](https://developer.spotify.com/dashboard)
-
-            2. **Add Redirect URI to Spotify App:** `{elena_dj.redirect_uri}`
+            **Essential API Keys** (Add to Secrets 🔒):
+            - `GROQ_API_KEY` - Get free at [console.groq.com](https://console.groq.com/)
+            - `SPOTIFY_CLIENT_ID` & `SPOTIFY_CLIENT_SECRET` - Get at [developer.spotify.com](https://developer.spotify.com/dashboard)
             
-            3. **Deploy on Replit** for best performance and sharing capabilities
-            """)
+            **Important:** Add this redirect URI to your Spotify app settings: `{}`
+            """.format(elena_dj.redirect_uri))
 
-        # Enhanced authentication section
-        with gr.Group(elem_classes=["auth-section"]):
-            gr.Markdown("## 🔐 Spotify Authentication", elem_classes=["section-title"])
+        # Authentication section
+        with gr.Group(elem_classes=["card", "auth-card"]):
+            gr.Markdown("### 🔐 Spotify Authentication")
             gr.Markdown("Connect your Spotify account to start creating personalized playlists")
-
+            
             with gr.Row():
-                auth_url_input = gr.Textbox(
-                    label="🔗 Paste callback URL from Spotify:",
-                    placeholder=f"{elena_dj.redirect_uri}?code=...",
-                    lines=2,
-                    scale=3,
-                    elem_classes=["input-enhanced"]
-                )
-                auth_btn = gr.Button("🔑 Connect Spotify", variant="primary", scale=1, elem_classes=["elena-btn"])
+                with gr.Column(scale=4):
+                    auth_url_input = gr.Textbox(
+                        label="🔗 Paste Spotify callback URL here:",
+                        placeholder=f"{elena_dj.redirect_uri}?code=...",
+                        lines=2,
+                        elem_classes=["modern-input"]
+                    )
+                with gr.Column(scale=1):
+                    auth_btn = gr.Button(
+                        "🎵 Connect Spotify", 
+                        variant="primary", 
+                        elem_classes=["elena-btn"]
+                    )
+            
+            auth_result = gr.Markdown("", elem_classes=["output-card"])
 
-            auth_result = gr.Markdown("", visible=True, elem_classes=["output-section"])
-
-        # Enhanced main content with redesigned tabs
-        with gr.Tabs():
-            # Enhanced Mood Mode Tab
-            with gr.TabItem("🎭 Mood-Based Discovery"):
-                with gr.Group(elem_classes=["mode-section"]):
-                    gr.Markdown("### 🎭 Emotion-Driven Playlists", elem_classes=["section-title"])
-                    gr.Markdown("**Let Elena analyze your feelings and curate the perfect soundtrack for your mood**")
-
+        # Main application tabs
+        with gr.Tabs(elem_classes=["tab-nav"]):
+            
+            # Mood-based playlist tab
+            with gr.TabItem("🎭 Mood Discovery", elem_id="mood-tab"):
+                with gr.Group(elem_classes=["card"]):
+                    gr.Markdown("### 🎭 Emotion-Driven Playlists")
+                    gr.Markdown("Describe your current feelings and let Elena create the perfect soundtrack")
+                    
                     with gr.Row():
                         with gr.Column(scale=3):
                             mood_input = gr.Textbox(
-                                label="🎭 Describe your current mood or feelings:",
-                                placeholder="Examples: 'feeling nostalgic and dreamy' • 'energetic and ready to conquer' • 'peaceful Sunday morning vibes'",
+                                label="💭 How are you feeling today?",
+                                placeholder="Examples: 'nostalgic and dreamy' • 'energetic and motivated' • 'peaceful Sunday vibes' • 'melancholic but hopeful'",
                                 lines=4,
-                                elem_classes=["input-enhanced"]
+                                elem_classes=["modern-input"]
                             )
-
                         with gr.Column(scale=1):
                             mood_language = gr.Dropdown(
                                 label="🌍 Music Language",
                                 choices=language_options,
                                 value="English",
-                                info="Elena will prioritize this language",
-                                elem_classes=["input-enhanced"]
+                                elem_classes=["modern-input"]
                             )
-
+                    
                     mood_generate_btn = gr.Button(
-                        "🎵 Create Mood Playlist",
+                        "🎵 Generate Mood Playlist",
                         variant="primary",
                         size="lg",
                         elem_classes=["elena-btn"]
                     )
-
-                    mood_output = gr.Markdown("", elem_classes=["output-section"])
-
-                    # Enhanced examples
-                    with gr.Group(elem_classes=["examples-section"]):
-                        gr.Markdown("### 🎨 Mood Examples:")
+                    
+                    mood_output = gr.Markdown("", elem_classes=["output-card"])
+                    
+                    # Mood examples
+                    with gr.Group(elem_classes=["examples-container"]):
+                        gr.Markdown("### 💡 Try These Mood Examples:")
                         gr.Examples(
                             examples=[
-                                ["I feel nostalgic and dreamy, like watching old movies on a rainy day", "English"],
+                                ["Feeling nostalgic and dreamy, like watching old movies on a rainy day", "English"],
+                                ["Energetic and ready to conquer the world, need pump-up music", "English"],
                                 ["Stresli ama pozitif kalmaya çalışıyorum, motivasyona ihtiyacım var", "Turkish"],
-                                ["Happy and energetic, ready to dance and celebrate life", "Spanish"],
-                                ["Mélancolique et introspectif, comme dans les films français", "French"],
-                                ["Confident and motivated, pumped up for my workout session", "English"],
-                                ["Peaceful and contemplative, need some zen vibes", "Japanese"],
-                                ["Romantic and passionate, thinking about someone special", "Italian"],
-                                ["Rebellious and edgy, feeling like breaking some rules", "English"]
+                                ["Mélancolique et introspectif, besoin de musique douce", "French"],
+                                ["Peaceful and contemplative, seeking zen and mindfulness", "English"],
+                                ["Romantic and passionate, thinking about someone special", "Spanish"],
+                                ["Confident and rebellious, feeling like breaking some rules", "English"],
+                                ["Tired but hopeful, end of a long day but optimistic", "English"]
                             ],
                             inputs=[mood_input, mood_language],
-                            label="Try these mood descriptions:"
+                            elem_classes=["examples-container"]
                         )
 
-            # Enhanced Custom Mode Tab
-            with gr.TabItem("🤖 AI-Powered Custom"):
-                with gr.Group(elem_classes=["mode-section"]):
-                    gr.Markdown("### 🤖 Custom AI Playlists", elem_classes=["section-title"])
-                    gr.Markdown("**Describe any playlist idea and let Elena's AI create the perfect tracklist**")
-
+            # Custom playlist tab
+            with gr.TabItem("🤖 Custom AI Playlists", elem_id="custom-tab"):
+                with gr.Group(elem_classes=["card"]):
+                    gr.Markdown("### 🤖 AI-Powered Custom Playlists")
+                    gr.Markdown("Describe any playlist concept and let Elena's AI create the perfect tracklist")
+                    
                     with gr.Row():
                         with gr.Column(scale=3):
                             custom_prompt = gr.Textbox(
-                                label="🤖 Describe your playlist concept:",
-                                placeholder="Examples: 'Epic songs for a road trip through mountains' • 'Chill lo-fi beats for studying late at night' • 'Workout motivation playlist'",
+                                label="🎯 Describe your playlist concept:",
+                                placeholder="Examples: 'Epic road trip through mountains' • 'Cozy coffee shop atmosphere' • 'Intense workout motivation' • 'Late night coding session'",
                                 lines=4,
-                                elem_classes=["input-enhanced"]
+                                elem_classes=["modern-input"]
                             )
-
                         with gr.Column(scale=1):
                             custom_language = gr.Dropdown(
                                 label="🌍 Music Language",
                                 choices=language_options,
                                 value="English",
-                                info="Elena will prioritize this language",
-                                elem_classes=["input-enhanced"]
+                                elem_classes=["modern-input"]
                             )
-
+                    
                     custom_songs = gr.Slider(
                         label="🎵 Number of Songs",
                         minimum=10,
                         maximum=50,
                         value=25,
                         step=5,
-                        info="More songs = better variety and discovery"
+                        elem_classes=["modern-input"]
                     )
-
+                    
                     custom_generate_btn = gr.Button(
                         "🎵 Generate AI Playlist",
                         variant="primary",
                         size="lg",
                         elem_classes=["elena-btn"]
                     )
-
-                    custom_output = gr.Markdown("", elem_classes=["output-section"])
-
-                    # Enhanced examples
-                    with gr.Group(elem_classes=["examples-section"]):
-                        gr.Markdown("### 🎨 Playlist Ideas:")
+                    
+                    custom_output = gr.Markdown("", elem_classes=["output-card"])
+                    
+                    # Custom playlist examples
+                    with gr.Group(elem_classes=["examples-container"]):
+                        gr.Markdown("### 💡 Try These Playlist Concepts:")
                         gr.Examples(
                             examples=[
                                 ["Cozy coffee shop atmosphere with indie and acoustic vibes", 20, "English"],
-                                ["Epic workout motivation with high-energy beats", 30, "English"],
-                                ["Romantic dinner background music with smooth jazz and soul", 15, "Spanish"],
+                                ["Epic workout motivation with high-energy electronic beats", 30, "English"],
+                                ["Romantic dinner background music with smooth jazz and soul", 15, "English"],
                                 ["Deep focus music for coding and productivity sessions", 40, "English"],
+                                ["Driving at night through the city with synthwave vibes", 25, "English"],
                                 ["Sabah rutini için neşeli ve enerjik Türkçe şarkılar", 25, "Turkish"],
                                 ["Relaxing spa and meditation soundscape", 35, "English"],
-                                ["90s nostalgia trip with the best hits from that decade", 45, "English"],
-                                ["Driving at night through the city with synthwave vibes", 30, "English"]
+                                ["90s nostalgia trip with the best hits from that decade", 45, "English"]
                             ],
                             inputs=[custom_prompt, custom_songs, custom_language],
-                            label="Try these playlist concepts:"
+                            elem_classes=["examples-container"]
                         )
 
-        # Enhanced features section
-        with gr.Group(elem_classes=["info-section"]):
-            gr.Markdown("""
-            ---
-            ## 🌟 Elena - Your DJ Features
-
-            **🆕 v2 Optimizations:**
-
-            **🎯 Enhanced AI Algorithms:** Better mood analysis and playlist generation  
-            **🎵 Quality Filtering:** Minimum popularity thresholds (60+ for English, 45+ for others)  
-            **👥 Artist Verification:** Checks artist popularity for quality assurance  
-            **🌍 Market-Specific Search:** Optimized for each language/region  
-            **🗣️ Superior Language Support:** Enhanced search terms and cultural context  
-            **🎨 Improved UI:** Modern design with better responsive layout  
-            **📝 Smart Descriptions:** AI automatically generates contextual playlist descriptions
+        # Features showcase
+        with gr.Group(elem_classes=["card"]):
+            gr.Markdown("## 🌟 Elena DJ Features")
+            
+            gr.HTML("""
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3>Advanced AI Analysis</h3>
+                    <p>Powered by LLaMA 3 70B for sophisticated mood understanding and music curation</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Quality Filtering</h3>
+                    <p>Smart popularity thresholds and artist verification ensure high-quality tracks</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Multi-Language Support</h3>
+                    <p>Optimized search algorithms for 11+ languages with regional market targeting</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure Integration</h3>
+                    <p>OAuth 2.0 authentication with Spotify for safe and private playlist creation</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Instant Creation</h3>
+                    <p>Generate and populate playlists directly in your Spotify account within seconds</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Smart Descriptions</h3>
+                    <p>AI-generated contextual playlist names and descriptions that capture your vibe</p>
+                </div>
+            </div>
             """)
 
-        # Enhanced event handlers
+        # Creator credit
+        with gr.Group(elem_classes=["card"]):
+            gr.Markdown("""
+            ---
+            ### 👨‍💻 Created by Han
+            **Elena - Your DJ** © 2024 • Built with ❤️ for Elena • Powered by AI & Music
+            
+            *A sophisticated music companion that transforms emotions into perfect playlists*
+            """, elem_classes=["text-center"])
+
+        # Event handlers
+        theme_btn.click(
+            fn=switch_theme,
+            inputs=[current_theme],
+            outputs=[current_theme, app],
+            show_progress=False
+        )
+
         auth_btn.click(
             fn=elena_dj.handle_authentication,
             inputs=auth_url_input,
@@ -1155,10 +1152,6 @@ def create_gradio_interface():
             outputs=custom_output,
             show_progress=True
         )
-
-        # Creator credit with green styling
-        with gr.Group(elem_classes=["creator-credit"]):
-            gr.Markdown("**Created By Han** • Elena - Your DJ © 2024 • Powered by AI & Music")
 
     return app
 
