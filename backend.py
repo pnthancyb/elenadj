@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 """
 Elena - Your DJ - Flask Backend API
@@ -17,6 +16,7 @@ import urllib.parse
 from typing import Dict, List, Optional, Tuple
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+import unicodedata
 
 # Configure logging
 logging.basicConfig(level=logging.INFO,
@@ -40,18 +40,49 @@ class ElenaDJ:
         self.redirect_uri = None
         self.setup_apis()
 
-    def setup_apis(self):
-        """Setup APIs with environment support"""
-        try:
-            # Get API keys
-            groq_api_key = os.getenv('GROQ_API_KEY')
-            self.spotify_client_id = os.getenv('SPOTIFY_CLIENT_ID')
-            self.spotify_client_secret = os.getenv('SPOTIFY_CLIENT_SECRET')
+    def clean_credential(self, credential: str) -> str:
+        """Clean credential string from unwanted characters and encoding issues"""
+        if not credential:
+            return ""
+        
+        # Remove any non-ASCII characters and normalize
+        credential = credential.encode('ascii', errors='ignore').decode('ascii')
+        
+        # Remove common unwanted characters
+        unwanted_chars = ['…', '​', '\u200b', '\u200c', '\u200d', '\ufeff']
+        for char in unwanted_chars:
+            credential = credential.replace(char, '')
+        
+        # Strip whitespace and newlines
+        credential = credential.strip().replace('\n', '').replace('\r', '')
+        
+        # Remove any trailing dots or special characters that might be artifacts
+        credential = re.sub(r'[^\w\-]$', '', credential)
+        
+        return credential
 
+    def setup_apis(self):
+        """Setup APIs with environment support and enhanced credential cleaning"""
+        try:
+            # Get API keys with enhanced cleaning
+            groq_api_key = self.clean_credential(os.getenv('GROQ_API_KEY', ''))
+            self.spotify_client_id = self.clean_credential(os.getenv('SPOTIFY_CLIENT_ID', ''))
+            self.spotify_client_secret = self.clean_credential(os.getenv('SPOTIFY_CLIENT_SECRET', ''))
+
+            # Validation
             if not groq_api_key:
                 raise ValueError("GROQ_API_KEY not found in environment")
             if not self.spotify_client_id or not self.spotify_client_secret:
                 raise ValueError("Spotify credentials not found in environment")
+
+            # Validate format
+            if len(self.spotify_client_id) != 32 or not re.match(r'^[a-zA-Z0-9]+$', self.spotify_client_id):
+                logger.warning(f"Spotify Client ID format seems incorrect: '{self.spotify_client_id}' (length: {len(self.spotify_client_id)})")
+                raise ValueError("Spotify Client ID format is invalid")
+
+            if len(self.spotify_client_secret) != 32 or not re.match(r'^[a-zA-Z0-9]+$', self.spotify_client_secret):
+                logger.warning(f"Spotify Client Secret format seems incorrect (length: {len(self.spotify_client_secret)})")
+                raise ValueError("Spotify Client Secret format is invalid")
 
             # Initialize Groq client
             self.groq_client = Groq(api_key=groq_api_key)
@@ -59,6 +90,8 @@ class ElenaDJ:
             # Setup Spotify OAuth
             self.redirect_uri = self.get_redirect_uri()
             logger.info(f"Using redirect URI: {self.redirect_uri}")
+            logger.info(f"Using Spotify Client ID: {self.spotify_client_id[:8]}... (length: {len(self.spotify_client_id)})")
+            logger.info(f"Spotify Client Secret length: {len(self.spotify_client_secret)}")
 
             logger.info("Elena - Your DJ APIs initialized successfully")
 
@@ -68,24 +101,28 @@ class ElenaDJ:
 
     def get_redirect_uri(self):
         """Get the correct redirect URI for current environment"""
-        redirect_uri = os.getenv('SPOTIFY_REDIRECT_URI')
-        if redirect_uri:
-            return redirect_uri
-
-        replit_domain = os.getenv('REPLIT_DEV_DOMAIN')
-        if replit_domain:
-            return f"https://{replit_domain}/api/spotify-callback"
-
+        # First priority: Environment variable
+        env_redirect = os.getenv('SPOTIFY_REDIRECT_URI')
+        if env_redirect:
+            return self.clean_credential(env_redirect)
+        
+        # Second priority: Local tunnel URL
         repl_url = os.getenv('REPL_URL')
         if repl_url:
             if not repl_url.startswith('https://'):
                 repl_url = repl_url.replace('http://', 'https://')
             return f"{repl_url}/api/spotify-callback"
-
+        
+        # Third priority: Replit dev domain
+        replit_domain = os.getenv('REPLIT_DEV_DOMAIN')
+        if replit_domain:
+            return f"https://{replit_domain}/api/spotify-callback"
+        
+        # Fallback: Local development
         return "http://127.0.0.1:5000/api/spotify-callback"
 
     def create_spotify_auth(self, session_id: str = "default") -> SpotifyOAuth:
-        """Create Spotify OAuth object"""
+        """Create Spotify OAuth object with proper encoding"""
         cache_dir = os.path.join(os.getcwd(), '.cache-spotify')
 
         try:
@@ -95,10 +132,17 @@ class ElenaDJ:
             logger.warning(f"Could not set up cache directory: {e}")
             cache_path = None
 
+        # Log the exact values being used (for debugging)
+        logger.info(f"Creating SpotifyOAuth with:")
+        logger.info(f"  Client ID: {self.spotify_client_id[:8]}... (len: {len(self.spotify_client_id)})")
+        logger.info(f"  Client Secret: {'*' * min(8, len(self.spotify_client_secret))}... (len: {len(self.spotify_client_secret)})")
+        logger.info(f"  Redirect URI: {self.redirect_uri}")
+
+        # Ensure all parameters are properly encoded strings
         return SpotifyOAuth(
-            client_id=self.spotify_client_id,
-            client_secret=self.spotify_client_secret,
-            redirect_uri=self.redirect_uri,
+            client_id=str(self.spotify_client_id),
+            client_secret=str(self.spotify_client_secret),
+            redirect_uri=str(self.redirect_uri),
             scope='playlist-modify-public playlist-modify-private',
             cache_path=cache_path,
             show_dialog=True,
@@ -106,14 +150,30 @@ class ElenaDJ:
         )
 
     def get_auth_url(self, session_id: str = "default") -> str:
-        """Get authorization URL"""
-        if session_id not in self.spotify_auths:
-            self.spotify_auths[session_id] = self.create_spotify_auth(session_id)
-        return self.spotify_auths[session_id].get_authorize_url()
+        """Get authorization URL with proper error handling"""
+        try:
+            if session_id not in self.spotify_auths:
+                self.spotify_auths[session_id] = self.create_spotify_auth(session_id)
+            
+            auth_url = self.spotify_auths[session_id].get_authorize_url()
+            logger.info(f"Generated auth URL: {auth_url[:100]}...")
+            
+            # Check if the URL contains any problematic characters
+            if '…' in auth_url or '\u2026' in auth_url:
+                logger.error("Auth URL contains ellipsis characters!")
+                raise ValueError("Auth URL contains invalid characters")
+                
+            return auth_url
+        except Exception as e:
+            logger.error(f"Failed to generate auth URL: {e}")
+            raise
 
     def authenticate_with_code(self, callback_url: str, session_id: str = "default") -> Tuple[bool, str]:
-        """Authenticate using callback URL"""
+        """Authenticate using callback URL with improved error handling"""
         try:
+            # Clean the callback URL
+            callback_url = callback_url.encode('ascii', errors='ignore').decode('ascii')
+            
             parsed_url = urllib.parse.urlparse(callback_url)
             query_params = urllib.parse.parse_qs(parsed_url.query)
 
@@ -126,6 +186,7 @@ class ElenaDJ:
                     return False, "No authorization code found in callback URL"
 
             code = query_params['code'][0]
+            logger.info(f"Received auth code: {code[:10]}...")
 
             if session_id not in self.spotify_auths:
                 self.spotify_auths[session_id] = self.create_spotify_auth(session_id)
@@ -150,19 +211,22 @@ class ElenaDJ:
             else:
                 return False, "Failed to exchange code for access token"
 
+        except UnicodeEncodeError as e:
+            logger.error(f"Unicode encoding error: {e}")
+            return False, "Authentication failed due to character encoding issues. Please ensure your Spotify credentials are properly configured."
         except Exception as e:
             logger.error(f"Authentication failed: {e}")
             return False, f"Authentication error: {str(e)}"
 
     def get_authenticated_client(self, session_id: str = "default") -> Optional[spotipy.Spotify]:
-        """Get authenticated Spotify client"""
-        for user_id, client in self.spotify_clients.items():
+        """Get authenticated Spotify client with better error handling"""
+        for user_id, client in list(self.spotify_clients.items()):
             try:
                 client.current_user()
                 return client
-            except Exception:
+            except Exception as e:
+                logger.warning(f"Client for user {user_id} is invalid: {e}")
                 del self.spotify_clients[user_id]
-                break
 
         if session_id in self.spotify_auths:
             try:
@@ -508,7 +572,57 @@ def get_auth_url():
         auth_url = elena_dj.get_auth_url()
         return jsonify({"auth_url": auth_url, "redirect_uri": elena_dj.redirect_uri})
     except Exception as e:
+        logger.error(f"Error getting auth URL: {e}")
         return jsonify({"error": str(e)}), 500
+
+@app.route('/api/spotify-callback')
+def spotify_callback():
+    """Handle Spotify OAuth callback"""
+    try:
+        code = request.args.get('code')
+        error = request.args.get('error')
+        
+        if error:
+            return f"<h1>Authentication Failed</h1><p>Error: {error}</p><p>Please close this window and try again.</p>"
+        
+        if code:
+            # Construct callback URL for processing
+            callback_url = request.url
+            success, message = elena_dj.authenticate_with_code(callback_url)
+            
+            if success:
+                return f'''
+                <html>
+                <head><title>Authentication Successful</title></head>
+                <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+                    <h1 style="color: green;">✅ Authentication Successful!</h1>
+                    <p>{message}</p>
+                    <p>You can now close this window and return to Elena DJ.</p>
+                    <script>
+                        setTimeout(function() {{
+                            window.close();
+                        }}, 3000);
+                    </script>
+                </body>
+                </html>
+                '''
+            else:
+                return f'''
+                <html>
+                <head><title>Authentication Failed</title></head>
+                <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+                    <h1 style="color: red;">❌ Authentication Failed</h1>
+                    <p>{message}</p>
+                    <p>Please close this window and try again.</p>
+                </body>
+                </html>
+                '''
+        else:
+            return "<h1>No authorization code received</h1><p>Please try again.</p>"
+            
+    except Exception as e:
+        logger.error(f"Callback error: {e}")
+        return f"<h1>Error</h1><p>{str(e)}</p>"
 
 @app.route('/api/authenticate', methods=['POST'])
 def authenticate():
