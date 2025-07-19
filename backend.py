@@ -24,7 +24,11 @@ logging.basicConfig(level=logging.INFO,
                     handlers=[logging.StreamHandler(sys.stdout)])
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__, static_folder='build', static_url_path='/')
+import os
+
+# Check if build folder exists, if not use a default
+static_folder = 'build' if os.path.exists('build') else 'public'
+app = Flask(__name__, static_folder=static_folder, static_url_path='/')
 CORS(app)
 
 class ElenaDJ:
@@ -448,7 +452,20 @@ elena_dj = ElenaDJ()
 # API Routes
 @app.route('/')
 def serve():
-    return send_from_directory(app.static_folder, 'index.html')
+    try:
+        return send_from_directory(app.static_folder, 'index.html')
+    except Exception as e:
+        return f"<h1>Elena DJ Backend is running!</h1><p>Frontend build not found. The React app should be running on port 3000.</p><p>API is available at /api/</p><p>Error: {str(e)}</p>", 200
+
+@app.route('/<path:path>')
+def serve_static(path):
+    try:
+        if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+            return send_from_directory(app.static_folder, path)
+        else:
+            return send_from_directory(app.static_folder, 'index.html')
+    except Exception:
+        return serve()
 
 @app.route('/api/auth-url')
 def get_auth_url():

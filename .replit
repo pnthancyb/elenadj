@@ -31,8 +31,8 @@ mode = "parallel"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd . && python backend.py"
+args = "npm run build"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd . && npm start"
+args = "cd . && python backend.py & cd . && npm start"
