@@ -1006,8 +1006,7 @@ def create_gradio_interface():
                                 ["Confident and rebellious, feeling like breaking some rules", "English"],
                                 ["Tired but hopeful, end of a long day but optimistic", "English"]
                             ],
-                            inputs=[mood_input, mood_language],
-                            elem_classes=["examples-container"]
+                            inputs=[mood_input, mood_language]
                         )
 
             # Custom playlist tab
@@ -1064,8 +1063,7 @@ def create_gradio_interface():
                                 ["Relaxing spa and meditation soundscape", 35, "English"],
                                 ["90s nostalgia trip with the best hits from that decade", 45, "English"]
                             ],
-                            inputs=[custom_prompt, custom_songs, custom_language],
-                            elem_classes=["examples-container"]
+                            inputs=[custom_prompt, custom_songs, custom_language]
                         )
 
         # Features showcase
